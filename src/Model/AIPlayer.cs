@@ -1,51 +1,66 @@
+﻿using SwinGameSDK;
 
-using Microsoft.VisualBasic;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 /// <summary>
 /// The AIPlayer is a type of player. It can readomly deploy ships, it also has the
 /// functionality to generate coordinates and shoot at tiles
-/// </summary>
+/// </summary> 
 public abstract class AIPlayer : Player
 {
+    /// <summary>
+    /// The numeric value for the AI's difficulty
+    /// </summary>
+    public virtual int Difficulty
+    {
+        get;
+    }
 
-	/// <summary>
-	/// Location can store the location of the last hit made by an
-	/// AI Player. The use of which determines the difficulty.
-	/// </summary>
-	protected class Location
+    /// <summary>
+    /// Location can store the location of the last hit made by an
+    /// AI Player. The use of which determines the difficulty.
+    /// </summary>
+    protected class Location
 	{
 		private int _Row;
-
 		private int _Column;
+
 		/// <summary>
-		/// The row of the shot
+		/// Gets or sets the row.
 		/// </summary>
-		/// <value>The row of the shot</value>
-		/// <returns>The row of the shot</returns>
-		public int Row {
-			get { return _Row; }
-			set { _Row = value; }
+		/// <value>The row.</value>
+		public int Row
+		{
+			get
+			{
+				return _Row;
+			}
+			set
+			{
+				_Row = value;
+			}
 		}
 
 		/// <summary>
-		/// The column of the shot
+		/// Gets or sets the column.
 		/// </summary>
-		/// <value>The column of the shot</value>
-		/// <returns>The column of the shot</returns>
-		public int Column {
-			get { return _Column; }
-			set { _Column = value; }
+		/// <value>The column.</value>
+		public int Column
+		{
+			get
+			{
+				return _Column;
+			}
+			set
+			{
+				_Column = value;
+			}
 		}
 
 		/// <summary>
-		/// Sets the last hit made to the local variables
+		/// Initializes a new instance of the <see cref="T:AIPlayer.Location"/> class.
+		/// Sets the last hit made to the local variables.
 		/// </summary>
-		/// <param name="row">the row of the location</param>
-		/// <param name="column">the column of the location</param>
+		/// <param name="row">the row of the location.</param>
+		/// <param name="column">the column of the location.</param>
 		public Location(int row, int column)
 		{
 			_Column = column;
@@ -53,34 +68,57 @@ public abstract class AIPlayer : Player
 		}
 
 		/// <summary>
-		/// Check if two locations are equal
+		/// Determines whether a specified instance of <see cref="AIPlayer.Location"/> is equal to another specified <see cref="AIPlayer.Location"/>.
 		/// </summary>
-		/// <param name="this">location 1</param>
-		/// <param name="other">location 2</param>
-		/// <returns>true if location 1 and location 2 are at the same spot</returns>
+		/// <param name="this">The first <see cref="AIPlayer.Location"/> to compare.</param>
+		/// <param name="other">The second <see cref="AIPlayer.Location"/> to compare.</param>
+		/// <returns><c>true</c> if <c>this</c> and <c>other</c> are equal; otherwise, <c>false</c>.</returns>
 		public static bool operator ==(Location @this, Location other)
 		{
-			return @this != null && other != null && @this.Row == other.Row && @this.Column == other.Column;
+			return @this != (object)null && other != (object)null && @this.Row == other.Row && @this.Column == other.Column;
 		}
 
 		/// <summary>
-		/// Check if two locations are not equal
+		/// Determines whether the specified <see cref="object"/> is equal to the current <see cref="T:AIPlayer.Location"/>.
 		/// </summary>
-		/// <param name="this">location 1</param>
-		/// <param name="other">location 2</param>
-		/// <returns>true if location 1 and location 2 are not at the same spot</returns>
+		/// <param name="obj">The <see cref="object"/> to compare with the current <see cref="T:AIPlayer.Location"/>.</param>
+		/// <returns><c>true</c> if the specified <see cref="object"/> is equal to the current <see cref="T:AIPlayer.Location"/>;
+		/// otherwise, <c>false</c>.</returns>
+		public override bool Equals(object obj)
+		{
+			return this == (Location)obj;
+		}
+
+		/// <summary>
+		/// Determines whether a specified instance of <see cref="AIPlayer.Location"/> is not equal to another specified <see cref="AIPlayer.Location"/>.
+		/// </summary>
+		/// <param name="this">The first <see cref="AIPlayer.Location"/> to compare.</param>
+		/// <param name="other">The second <see cref="AIPlayer.Location"/> to compare.</param>
+		/// <returns><c>true</c> if <c>this</c> and <c>other</c> are not equal; otherwise, <c>false</c>.</returns>
 		public static bool operator !=(Location @this, Location other)
 		{
-			return @this == null || other == null || @this.Row != other.Row || @this.Column != other.Column;
+			return !(@this == other);
+		}
+
+		// shut up, compiler
+		public override int GetHashCode()
+		{
+#pragma warning disable RECS0025 // Non-readonly field referenced in 'GetHashCode()'
+			return _Column * 10 + _Row;
+#pragma warning restore RECS0025 // Non-readonly field referenced in 'GetHashCode'
 		}
 	}
 
-
-	public AIPlayer(BattleShipsGame game) : base(game)
+	/// <summary>
+	/// Initializes a new instance of the <see cref="T:AIPlayer"/> class.
+	/// </summary>
+	/// <param name="game">Game.</param>
+	protected AIPlayer(BattleShipsGame game, bool isExtendedMap) : base(game, isExtendedMap)
 	{
 	}
 
 	/// <summary>
+	/// Generates the coords.
 	/// Generate a valid row, column to shoot at
 	/// </summary>
 	/// <param name="row">output the row for the next shot</param>
@@ -88,34 +126,39 @@ public abstract class AIPlayer : Player
 	protected abstract void GenerateCoords(ref int row, ref int column);
 
 	/// <summary>
+	/// Processes the shot.
 	/// The last shot had the following result. Child classes can use this
 	/// to prepare for the next shot.
+	/// // result = 
 	/// </summary>
-	/// <param name="result">The result of the shot</param>
 	/// <param name="row">the row shot</param>
 	/// <param name="col">the column shot</param>
+	/// <param name="result">The result of the shot</param>
 	protected abstract void ProcessShot(int row, int col, AttackResult result);
 
 	/// <summary>
+	/// Attack this instance.
 	/// The AI takes its attacks until its go is over.
 	/// </summary>
-	/// <returns>The result of the last attack</returns>
+	/// <returns>The attack.</returns>
 	public override AttackResult Attack()
 	{
-		AttackResult result = default(AttackResult);
+		AttackResult result = null;
 		int row = 0;
 		int column = 0;
 
-		//keep hitting until a miss
-		do {
+		// keep hitting until there's a miss
+		do
+		{
 			Delay();
 
+			// generate coordinates for shot
 			GenerateCoords(ref row, ref column);
-			//generate coordinates for shot
+
+			// take shot
 			result = _game.Shoot(row, column);
-			//take shot
 			ProcessShot(row, column, result);
-		} while (result.Value != ResultOfAttack.Miss && result.Value != ResultOfAttack.GameOver && !SwinGame.WindowCloseRequested);
+		} while (result.Value != ResultOfAttack.Miss && result.Value != ResultOfAttack.GameOver && !SwinGame.WindowCloseRequested());
 
 		return result;
 	}
@@ -126,10 +169,13 @@ public abstract class AIPlayer : Player
 	private void Delay()
 	{
 		int i = 0;
-		for (i = 0; i <= 150; i++) {
-			//Dont delay if window is closed
-			if (SwinGame.WindowCloseRequested)
+		for (i = 0; i <= 150; i++)
+		{
+			// Don't delay if window is closed
+			if (SwinGame.WindowCloseRequested())
+			{
 				return;
+			}
 
 			SwinGame.Delay(5);
 			SwinGame.ProcessEvents();
@@ -137,10 +183,3 @@ public abstract class AIPlayer : Player
 		}
 	}
 }
-
-//=======================================================
-//Service provided by Telerik (www.telerik.com)
-//Conversion powered by NRefactory.
-//Twitter: @telerik
-//Facebook: facebook.com/telerik
-//=======================================================

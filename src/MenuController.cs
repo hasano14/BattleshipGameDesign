@@ -1,10 +1,3 @@
-
-using Microsoft.VisualBasic;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 using SwinGameSDK;
 
 /// <summary>
@@ -13,8 +6,9 @@ using SwinGameSDK;
 /// menu and the settings m,enu.
 /// </summary>
 
-static class MenuController
+public class MenuController
 {
+	internal GameController _controller;
 
 	/// <summary>
 	/// The menu structure for the game.
@@ -22,72 +16,84 @@ static class MenuController
 	/// <remarks>
 	/// These are the text captions for the menu items.
 	/// </remarks>
-	private static readonly string[][] _menuStructure = {
-		new string[] {
-			"PLAY",
-			"SETUP",
-			"SCORES",
-			"QUIT"
-		},
-		new string[] {
-			"RETURN",
-			"SURRENDER",
-			"QUIT"
-		},
-		new string[] {
-			"EASY",
-			"MEDIUM",
-			"HARD"
-		}
-
+	protected static readonly string[][] _menuStructure =
+	{
+		new string[] {"PLAY", "DIFFICULTY", "  NIGHTMARE", "THEME", "SCORES", "QUIT"},
+		new string[] {"RETURN", "RESET", "CHEAT", "SURRENDER", "QUIT"},
+		new string[] {"EASY", "MEDIUM", "HARD"},
+		new string[] {"DEFAULT", "PIRATE","DEFAULT+", "PIRATE+"}
 	};
-	private const int MENU_TOP = 575;
-	private const int MENU_LEFT = 30;
-	private const int MENU_GAP = 0;
-	private const int BUTTON_WIDTH = 75;
-	private const int BUTTON_HEIGHT = 15;
-	private const int BUTTON_SEP = BUTTON_WIDTH + MENU_GAP;
 
-	private const int TEXT_OFFSET = 0;
-	private const int MAIN_MENU = 0;
-	private const int GAME_MENU = 1;
+	protected const int MENU_TOP = 575;
+	protected const int MENU_LEFT = 30;
+	protected const int MENU_GAP = 0;
+	protected const int BUTTON_WIDTH = 75;
+	protected const int BUTTON_HEIGHT = 15;
+	protected const int BUTTON_SEP = BUTTON_WIDTH + MENU_GAP;
+	protected const int TEXT_OFFSET = 0;
 
-	private const int SETUP_MENU = 2;
-	private const int MAIN_MENU_PLAY_BUTTON = 0;
-	private const int MAIN_MENU_SETUP_BUTTON = 1;
-	private const int MAIN_MENU_TOP_SCORES_BUTTON = 2;
+	protected const int MAIN_MENU = 0;
+	protected const int GAME_MENU = 1;
+	protected const int SETUP_MENU = 2;
+	protected const int THEMES_MENU = 3;
 
-	private const int MAIN_MENU_QUIT_BUTTON = 3;
-	private const int SETUP_MENU_EASY_BUTTON = 0;
-	private const int SETUP_MENU_MEDIUM_BUTTON = 1;
-	private const int SETUP_MENU_HARD_BUTTON = 2;
+	protected const int MAIN_MENU_PLAY_BUTTON = 0;
+    protected const int MAIN_MENU_SETUP_BUTTON = 1;
+    protected const int MAIN_MENU_NIGHTMARE_BUTTON = 2;
+    protected const int MAIN_MENU_THEMES_BUTTON = 3;
+	protected const int MAIN_MENU_TOP_SCORES_BUTTON = 4;
+	protected const int MAIN_MENU_QUIT_BUTTON = 5;
 
-	private const int SETUP_MENU_EXIT_BUTTON = 3;
-	private const int GAME_MENU_RETURN_BUTTON = 0;
-	private const int GAME_MENU_SURRENDER_BUTTON = 1;
+	protected const int SETUP_MENU_EASY_BUTTON = 0;
+	protected const int SETUP_MENU_MEDIUM_BUTTON = 1;
+	protected const int SETUP_MENU_HARD_BUTTON = 2;
+	protected const int SETUP_MENU_EXIT_BUTTON = 3;
 
-	private const int GAME_MENU_QUIT_BUTTON = 2;
-	private static readonly Color MENU_COLOR = SwinGame.RGBAColor(2, 167, 252, 255);
+	protected const int THEMES_MENU_THEME_DEFAULT_BUTTON = 0;
+	protected const int THEMES_MENU_THEME_PIRATE_BUTTON = 1;
+	protected const int THEMES_MENU_THEME_DEFAULT_BUTTON_EXTENDED = 2;
+	protected const int THEMES_MENU_THEME_PIRATE_BUTTON_EXTENDED = 3;
+	protected const int THEMES_MENU_EXIT_BUTTON = 5;
 
-	private static readonly Color HIGHLIGHT_COLOR = SwinGame.RGBAColor(1, 57, 86, 255);
+	protected const int GAME_MENU_RETURN_BUTTON = 0;
+	protected const int GAME_MENU_RESET_BUTTON = 1;
+	protected const int GAME_MENU_CHEAT_BUTTON = 2;
+	protected const int GAME_MENU_SURRENDER_BUTTON = 3;
+	protected const int GAME_MENU_QUIT_BUTTON = 4;
+
+	protected static readonly Color MENU_COLOR = SwinGame.RGBAColor(2, 167, 252, 255);
+	protected static readonly Color HIGHLIGHT_COLOR = SwinGame.RGBAColor(1, 57, 86, 255);
+
+	private string Difficulty = "Easy";
+
 	/// <summary>
 	/// Handles the processing of user input when the main menu is showing
 	/// </summary>
-	public static void HandleMainMenuInput()
+	public void HandleMainMenuInput()
 	{
 		HandleMenuInput(MAIN_MENU, 0, 0);
 	}
 
 	/// <summary>
-	/// Handles the processing of user input when the main menu is showing
+	/// Handles the processing of user input when the difficulty menu is showing
 	/// </summary>
-	public static void HandleSetupMenuInput()
+	public void HandleSetupMenuInput()
 	{
-		bool handled = false;
-		handled = HandleMenuInput(SETUP_MENU, 1, 1);
+		bool handled = HandleMenuInput(SETUP_MENU, 1, 1);
 
-		if (!handled) {
-			HandleMenuInput(MAIN_MENU, 0, 0);
+		if (!handled)
+		{
+			HandleMainMenuInput();
+		}
+	}
+
+	public void HandleThemeMenuInput()
+	{
+		bool handled = HandleMenuInput(THEMES_MENU, 1, 1);
+
+		if (!handled)
+		{
+			HandleMainMenuInput();
 		}
 	}
 
@@ -97,7 +103,7 @@ static class MenuController
 	/// <remarks>
 	/// Player can return to the game, surrender, or quit entirely
 	/// </remarks>
-	public static void HandleGameMenuInput()
+	public void HandleGameMenuInput()
 	{
 		HandleMenuInput(GAME_MENU, 0, 0);
 	}
@@ -109,26 +115,30 @@ static class MenuController
 	/// <param name="level">the vertical level of the menu</param>
 	/// <param name="xOffset">the xoffset of the menu</param>
 	/// <returns>false if a clicked missed the buttons. This can be used to check prior menus.</returns>
-	private static bool HandleMenuInput(int menu, int level, int xOffset)
+	protected virtual bool HandleMenuInput(int menu, int level, int xOffset)
 	{
-		if (SwinGame.KeyTyped(KeyCode.VK_ESCAPE)) {
-			EndCurrentState();
+		if (SwinGame.KeyTyped(KeyCode.vk_ESCAPE))
+		{
+			_controller.EndCurrentState();
 			return true;
 		}
 
-		if (SwinGame.MouseClicked(MouseButton.LeftButton)) {
-			int i = 0;
-			for (i = 0; i <= _menuStructure(menu).Length - 1; i++) {
+		if (SwinGame.MouseClicked(MouseButton.LeftButton))
+		{
+			for (int i = 0; i < _menuStructure[menu].Length; i++)
+			{
 				//IsMouseOver the i'th button of the menu
-				if (IsMouseOverMenu(i, level, xOffset)) {
+				if (IsMouseOverMenu(i, level, xOffset))
+				{
 					PerformMenuAction(menu, i);
 					return true;
 				}
 			}
 
-			if (level > 0) {
+			if (level > 0)
+			{
 				//none clicked - so end this sub menu
-				EndCurrentState();
+				_controller.EndCurrentState();
 			}
 		}
 
@@ -138,22 +148,27 @@ static class MenuController
 	/// <summary>
 	/// Draws the main menu to the screen.
 	/// </summary>
-	public static void DrawMainMenu()
+	public void DrawMainMenu()
 	{
-		//Clears the Screen to Black
-		//SwinGame.DrawText("Main Menu", Color.White, GameFont("ArialLarge"), 50, 50)
+        //Clears the Screen to Black
+        //SwinGame.DrawText("Main Menu", Color.White, GameFont("ArialLarge"), 50, 50)
+        SwinGame.DrawText("Difficulty: " + Difficulty, Color.Red, 500, 585);
 
-		DrawButtons(MAIN_MENU);
+        if (BattleShipsGame.NightMare)
+        {
+            SwinGame.DrawText("!!NIGHTMARE!!", Color.Red, 500, 560);
+        }
+        DrawButtons(MAIN_MENU);
 	}
 
 	/// <summary>
 	/// Draws the Game menu to the screen
 	/// </summary>
-	public static void DrawGameMenu()
+	public void DrawGameMenu()
 	{
 		//Clears the Screen to Black
 		//SwinGame.DrawText("Paused", Color.White, GameFont("ArialLarge"), 50, 50)
-
+		SwinGame.DrawText("Difficulty: " + Difficulty, Color.Red, 500, 585);
 		DrawButtons(GAME_MENU);
 	}
 
@@ -163,7 +178,7 @@ static class MenuController
 	/// <remarks>
 	/// Also shows the main menu
 	/// </remarks>
-	public static void DrawSettings()
+	public void DrawSettings()
 	{
 		//Clears the Screen to Black
 		//SwinGame.DrawText("Settings", Color.White, GameFont("ArialLarge"), 50, 50)
@@ -173,10 +188,22 @@ static class MenuController
 	}
 
 	/// <summary>
+	/// Draws the themes menu to the screen.
+	/// </summary>
+	/// <remarks>
+	/// Also shows the main menu
+	/// </remarks>
+	public void DrawThemesMenu()
+	{
+		DrawButtons(MAIN_MENU);
+		DrawButtons(THEMES_MENU, 1, 1);
+	}
+
+	/// <summary>
 	/// Draw the buttons associated with a top level menu.
 	/// </summary>
 	/// <param name="menu">the index of the menu to draw</param>
-	private static void DrawButtons(int menu)
+	protected void DrawButtons(int menu)
 	{
 		DrawButtons(menu, 0, 0);
 	}
@@ -192,19 +219,18 @@ static class MenuController
 	/// of the menu, to enable sub menus. The xOffset repositions the menu horizontally
 	/// to allow the submenus to be positioned correctly.
 	/// </remarks>
-	private static void DrawButtons(int menu, int level, int xOffset)
+	protected virtual void DrawButtons(int menu, int level, int xOffset)
 	{
-		int btnTop = 0;
+		int btnTop = MENU_TOP - (MENU_GAP + BUTTON_HEIGHT) * level;
 
-		btnTop = MENU_TOP - (MENU_GAP + BUTTON_HEIGHT) * level;
-		int i = 0;
-		for (i = 0; i <= _menuStructure(menu).Length - 1; i++) {
-			int btnLeft = 0;
-			btnLeft = MENU_LEFT + BUTTON_SEP * (i + xOffset);
+		for (int i = 0; i < _menuStructure[menu].Length; i++)
+		{
+			int btnLeft = MENU_LEFT + BUTTON_SEP * (i + xOffset);
 			//SwinGame.FillRectangle(Color.White, btnLeft, btnTop, BUTTON_WIDTH, BUTTON_HEIGHT)
-			SwinGame.DrawTextLines(_menuStructure(menu)(i), MENU_COLOR, Color.Black, GameFont("Menu"), FontAlignment.AlignCenter, btnLeft + TEXT_OFFSET, btnTop + TEXT_OFFSET, BUTTON_WIDTH, BUTTON_HEIGHT);
+			SwinGame.DrawTextLines(_menuStructure[menu][i], MENU_COLOR, Color.Black, _controller.Resources.GameFont("Menu"), FontAlignment.AlignCenter, btnLeft + TEXT_OFFSET, btnTop + TEXT_OFFSET, BUTTON_WIDTH, BUTTON_HEIGHT);
 
-			if (SwinGame.MouseDown(MouseButton.LeftButton) & IsMouseOverMenu(i, level, xOffset)) {
+			if (SwinGame.MouseDown(MouseButton.LeftButton) && IsMouseOverMenu(i, level, xOffset))
+			{
 				SwinGame.DrawRectangle(HIGHLIGHT_COLOR, btnLeft, btnTop, BUTTON_WIDTH, BUTTON_HEIGHT);
 			}
 		}
@@ -215,7 +241,7 @@ static class MenuController
 	/// </summary>
 	/// <param name="button">the index of the button to check</param>
 	/// <returns>true if the mouse is over that button</returns>
-	private static bool IsMouseOverButton(int button)
+	protected static bool IsMouseOverButton(int button)
 	{
 		return IsMouseOverMenu(button, 0, 0);
 	}
@@ -227,12 +253,12 @@ static class MenuController
 	/// <param name="level">the level of the menu</param>
 	/// <param name="xOffset">the xOffset of the menu</param>
 	/// <returns>true if the mouse is over the button</returns>
-	private static bool IsMouseOverMenu(int button, int level, int xOffset)
+	protected static bool IsMouseOverMenu(int button, int level, int xOffset)
 	{
 		int btnTop = MENU_TOP - (MENU_GAP + BUTTON_HEIGHT) * level;
 		int btnLeft = MENU_LEFT + BUTTON_SEP * (button + xOffset);
 
-		return IsMouseInRectangle(btnLeft, btnTop, BUTTON_WIDTH, BUTTON_HEIGHT);
+		return ScreenController.IsMouseInRectangle(btnLeft, btnTop, BUTTON_WIDTH, BUTTON_HEIGHT);
 	}
 
 	/// <summary>
@@ -240,9 +266,10 @@ static class MenuController
 	/// </summary>
 	/// <param name="menu">the menu that has been clicked</param>
 	/// <param name="button">the index of the button that was clicked</param>
-	private static void PerformMenuAction(int menu, int button)
+	protected virtual void PerformMenuAction(int menu, int button)
 	{
-		switch (menu) {
+		switch (menu)
+		{
 			case MAIN_MENU:
 				PerformMainMenuAction(button);
 				break;
@@ -252,6 +279,9 @@ static class MenuController
 			case GAME_MENU:
 				PerformGameMenuAction(button);
 				break;
+			case THEMES_MENU:
+				PerformThemesMenuAction(button);
+				break;
 		}
 	}
 
@@ -259,71 +289,119 @@ static class MenuController
 	/// The main menu was clicked, perform the button's action.
 	/// </summary>
 	/// <param name="button">the button pressed</param>
-	private static void PerformMainMenuAction(int button)
+	protected virtual void PerformMainMenuAction(int button)
 	{
-		switch (button) {
+		switch (button)
+		{
 			case MAIN_MENU_PLAY_BUTTON:
-				StartGame();
+				_controller.StartGame();
 				break;
 			case MAIN_MENU_SETUP_BUTTON:
-				AddNewState(GameState.AlteringSettings);
+				_controller.AddNewState(GameState.AlteringSettings);
+				break;
+			case MAIN_MENU_THEMES_BUTTON:
+				_controller.AddNewState(GameState.AlteringTheme);
 				break;
 			case MAIN_MENU_TOP_SCORES_BUTTON:
-				AddNewState(GameState.ViewingHighScores);
+				_controller.AddNewState(GameState.ViewingHighScores);
 				break;
-			case MAIN_MENU_QUIT_BUTTON:
-				EndCurrentState();
-				break;
-		}
+            case MAIN_MENU_QUIT_BUTTON:
+                _controller.EndCurrentState();
+                break;
+            case MAIN_MENU_NIGHTMARE_BUTTON:
+                BattleShipsGame.NightMare = !BattleShipsGame.NightMare;
+                break;
+        }
 	}
 
 	/// <summary>
 	/// The setup menu was clicked, perform the button's action.
 	/// </summary>
 	/// <param name="button">the button pressed</param>
-	private static void PerformSetupMenuAction(int button)
+	protected virtual void PerformSetupMenuAction(int button)
 	{
-		switch (button) {
+		switch (button)
+		{
 			case SETUP_MENU_EASY_BUTTON:
-				SetDifficulty(AIOption.Hard);
+				_controller.SetDifficulty(AIOption.Easy);
+				Difficulty = "Easy";
 				break;
 			case SETUP_MENU_MEDIUM_BUTTON:
-				SetDifficulty(AIOption.Hard);
+				_controller.SetDifficulty(AIOption.Medium);
+				Difficulty = "Medium";
 				break;
 			case SETUP_MENU_HARD_BUTTON:
-				SetDifficulty(AIOption.Hard);
+				_controller.SetDifficulty(AIOption.Hard);
+				Difficulty = "Hard";
 				break;
 		}
 		//Always end state - handles exit button as well
-		EndCurrentState();
+		_controller.EndCurrentState();
+	}
+
+	/// <summary>
+	/// The theme menu was clicked, perform the button's action.
+	/// </summary>
+	/// <param name="button">the button pressed</param>
+	protected virtual void PerformThemesMenuAction(int button)
+	{
+		switch (button)
+		{
+		case THEMES_MENU_THEME_DEFAULT_BUTTON:
+				_controller.Resources.FreeResources ();
+				_controller.ExtendedMap = false;
+				_controller.Resources = new GameResources("ThemeDefault");
+				_controller.screenController.UpdateGameSize ();
+				break;
+			case THEMES_MENU_THEME_PIRATE_BUTTON:
+				_controller.Resources.FreeResources ();
+				_controller.ExtendedMap = false;
+				_controller.Resources = new GameResources ("ThemePirate");
+				_controller.screenController.UpdateGameSize ();
+				break;
+			case THEMES_MENU_THEME_DEFAULT_BUTTON_EXTENDED:
+				_controller.Resources.FreeResources();
+				_controller.ExtendedMap = true;
+				_controller.Resources = new GameResources("ThemeDefaultPlus");
+				_controller.screenController.UpdateGameSize ();
+				break;
+			case THEMES_MENU_THEME_PIRATE_BUTTON_EXTENDED:
+				_controller.Resources.FreeResources();
+				_controller.ExtendedMap = true;
+				_controller.Resources = new GameResources("ThemePiratePlus");
+				_controller.screenController.UpdateGameSize ();
+				break;
+		}
+		//Always end state - handles cancel button as well
+		_controller.EndCurrentState();
 	}
 
 	/// <summary>
 	/// The game menu was clicked, perform the button's action.
 	/// </summary>
 	/// <param name="button">the button pressed</param>
-	private static void PerformGameMenuAction(int button)
+	protected virtual void PerformGameMenuAction(int button)
 	{
-		switch (button) {
+		switch (button)
+		{
 			case GAME_MENU_RETURN_BUTTON:
-				EndCurrentState();
+				_controller.EndCurrentState();
+				break;
+			case GAME_MENU_RESET_BUTTON:
+				_controller.EndCurrentState();
+				_controller.ResetGame();
+				break;
+			case GAME_MENU_CHEAT_BUTTON:
+				_controller.EndCurrentState();
+				_controller.AddNewState(GameState.Cheat);
 				break;
 			case GAME_MENU_SURRENDER_BUTTON:
-				EndCurrentState();
-				//end game menu
-				EndCurrentState();
-				//end game
+				_controller.EndCurrentState(); //end game menu
+				_controller.EndCurrentState(); //end game
 				break;
 			case GAME_MENU_QUIT_BUTTON:
-				AddNewState(GameState.Quitting);
+				_controller.AddNewState(GameState.Quitting);
 				break;
 		}
 	}
 }
-
-//=======================================================
-//Service provided by Telerik (www.telerik.com)
-//Conversion powered by NRefactory.
-//Twitter: @telerik
-//Facebook: facebook.com/telerik
-//=======================================================

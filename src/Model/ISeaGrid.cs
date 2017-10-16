@@ -1,10 +1,5 @@
+﻿using System;
 
-using Microsoft.VisualBasic;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 /// <summary>
 /// The ISeaGrid defines the read only interface of a Grid. This
 /// allows each player to see and attack their opponents grid.
@@ -12,15 +7,15 @@ using System.Diagnostics;
 public interface ISeaGrid
 {
 
-
 	int Width { get; }
 
 	int Height { get; }
+
 	/// <summary>
 	/// Indicates that the grid has changed.
 	/// </summary>
-
 	event EventHandler Changed;
+
 	/// <summary>
 	/// Provides access to the given row/column
 	/// </summary>
@@ -28,8 +23,8 @@ public interface ISeaGrid
 	/// <param name="column">the column to access</param>
 	/// <value>what the player can see at that location</value>
 	/// <returns>what the player can see at that location</returns>
+	TileView Item(int row, int column);
 
-	TileView Item { get; }
 	/// <summary>
 	/// Mark the indicated tile as shot.
 	/// </summary>
@@ -38,10 +33,3 @@ public interface ISeaGrid
 	/// <returns>the result of the attack</returns>
 	AttackResult HitTile(int row, int col);
 }
-
-//=======================================================
-//Service provided by Telerik (www.telerik.com)
-//Conversion powered by NRefactory.
-//Twitter: @telerik
-//Facebook: facebook.com/telerik
-//=======================================================

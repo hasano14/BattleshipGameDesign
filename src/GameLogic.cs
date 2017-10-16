@@ -1,10 +1,5 @@
+﻿using SwinGameSDK;
 
-using Microsoft.VisualBasic;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 static class GameLogic
 {
 	public static void Main()
@@ -13,26 +8,28 @@ static class GameLogic
 		SwinGame.OpenGraphicsWindow("Battle Ships", 800, 600);
 
 		//Load Resources
-		LoadResources();
+		var resources = new GameResources("ThemeDefault", true);
 
-		SwinGame.PlayMusic(GameMusic("Background"));
+        //SetGlobals default
+        BattleShipsGame.NightMare = false;
 
 		//Game Loop
-		do {
-			HandleUserInput();
-			DrawScreen();
-		} while (!(SwinGame.WindowCloseRequested() == true | CurrentState == GameState.Quitting));
+		var controller = new GameController(resources: resources,
+											screenController: new ScreenController(),
+											menuController: new MenuController(),
+											deploymentController: new DeploymentController(),
+											discoveryController: new DiscoveryController(),
+											endingGameController: new EndingGameController(),
+											highScoreController: new HighScoreController());
+		do
+		{
+			controller.HandleUserInput();
+			controller.DrawScreen();
+		} while (!(SwinGame.WindowCloseRequested() == true || controller.CurrentState == GameState.Quitting));
 
 		SwinGame.StopMusic();
 
 		//Free Resources and Close Audio, to end the program.
-		FreeResources();
+		resources.FreeResources();
 	}
 }
-
-//=======================================================
-//Service provided by Telerik (www.telerik.com)
-//Conversion powered by NRefactory.
-//Twitter: @telerik
-//Facebook: facebook.com/telerik
-//=======================================================

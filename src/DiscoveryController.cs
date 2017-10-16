@@ -1,17 +1,12 @@
-
-using Microsoft.VisualBasic;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 using SwinGameSDK;
 
 /// <summary>
 /// The battle phase is handled by the DiscoveryController.
 /// </summary>
-static class DiscoveryController
+public class DiscoveryController
 {
+	internal GameController _controller;
 
 	/// <summary>
 	/// Handles input during the discovery phase of the game.
@@ -20,35 +15,52 @@ static class DiscoveryController
 	/// Escape opens the game menu. Clicking the mouse will
 	/// attack a location.
 	/// </remarks>
-	public static void HandleDiscoveryInput()
+	public virtual void HandleDiscoveryInput()
 	{
-		if (SwinGame.KeyTyped(KeyCode.VK_ESCAPE)) {
-			AddNewState(GameState.ViewingGameMenu);
+		if (SwinGame.KeyTyped(KeyCode.vk_ESCAPE))
+		{
+			_controller.AddNewState(GameState.ViewingGameMenu);
 		}
 
-		if (SwinGame.MouseClicked(MouseButton.LeftButton)) {
+		if (SwinGame.MouseClicked(MouseButton.LeftButton))
+		{
 			DoAttack();
+		}
+
+		if (_controller.CurrentState != GameState.Cheat && SwinGame.KeyDown(KeyCode.vk_c))
+		{
+			_controller.AddNewState(GameState.Cheat);
+		}
+
+		if (_controller.CurrentState == GameState.Discovering && SwinGame.KeyDown(KeyCode.vk_r))
+		{
+			_controller.ResetGame();
 		}
 	}
 
 	/// <summary>
 	/// Attack the location that the mouse if over.
 	/// </summary>
-	private static void DoAttack()
+	private void DoAttack()
 	{
-		Point2D mouse = default(Point2D);
+		Point2D mouse = SwinGame.MousePosition();
 
-		mouse = SwinGame.MousePosition();
+		if (_controller.CurrentState == GameState.Cheat && SwinGame.MouseClicked(MouseButton.LeftButton))
+		{
+			_controller.EndCurrentState();
+		}
 
 		//Calculate the row/col clicked
 		int row = 0;
 		int col = 0;
-		row = Convert.ToInt32(Math.Floor((mouse.Y - FIELD_TOP) / (CELL_HEIGHT + CELL_GAP)));
-		col = Convert.ToInt32(Math.Floor((mouse.X - FIELD_LEFT) / (CELL_WIDTH + CELL_GAP)));
+		row = Convert.ToInt32(Math.Floor((mouse.Y - ScreenController.FIELD_TOP) / (ScreenController.CELL_HEIGHT + ScreenController.CELL_GAP)));
+		col = Convert.ToInt32(Math.Floor((mouse.X - ScreenController.FIELD_LEFT) / (ScreenController.CELL_WIDTH + ScreenController.CELL_GAP)));
 
-		if (row >= 0 & row < HumanPlayer.EnemyGrid.Height) {
-			if (col >= 0 & col < HumanPlayer.EnemyGrid.Width) {
-				Attack(row, col);
+		if (row >= 0 && row < _controller.HumanPlayer.EnemyGrid.Height)
+		{
+			if (col >= 0 && col < _controller.HumanPlayer.EnemyGrid.Width)
+			{
+				_controller.Attack(row, col);
 			}
 		}
 	}
@@ -56,32 +68,53 @@ static class DiscoveryController
 	/// <summary>
 	/// Draws the game during the attack phase.
 	/// </summary>s
-	public static void DrawDiscovery()
+	public virtual void DrawDiscovery()
 	{
 		const int SCORES_LEFT = 172;
 		const int SHOTS_TOP = 157;
 		const int HITS_TOP = 206;
 		const int SPLASH_TOP = 256;
 
-		if ((SwinGame.KeyDown(KeyCode.VK_LSHIFT) | SwinGame.KeyDown(KeyCode.VK_RSHIFT)) & SwinGame.KeyDown(KeyCode.VK_C)) {
-			DrawField(HumanPlayer.EnemyGrid, ComputerPlayer, true);
-		} else {
-			DrawField(HumanPlayer.EnemyGrid, ComputerPlayer, false);
+		if ((SwinGame.KeyDown(KeyCode.vk_LSHIFT) || SwinGame.KeyDown(KeyCode.vk_RSHIFT)) && SwinGame.KeyDown(KeyCode.vk_c))
+		{
+			_controller.screenController.DrawField(_controller.HumanPlayer.EnemyGrid, _controller.ComputerPlayer, true);
+		}
+		else
+		{
+			_controller.screenController.DrawField(_controller.HumanPlayer.EnemyGrid, _controller.ComputerPlayer, false);
 		}
 
-		DrawSmallField(HumanPlayer.PlayerGrid, HumanPlayer);
-		DrawMessage();
+		_controller.screenController.DrawSmallField(_controller.HumanPlayer.PlayerGrid, _controller.HumanPlayer);
+		_controller.screenController.DrawMessage();
 
-		SwinGame.DrawText(HumanPlayer.Shots.ToString(), Color.White, GameFont("Menu"), SCORES_LEFT, SHOTS_TOP);
-		SwinGame.DrawText(HumanPlayer.Hits.ToString(), Color.White, GameFont("Menu"), SCORES_LEFT, HITS_TOP);
-		SwinGame.DrawText(HumanPlayer.Missed.ToString(), Color.White, GameFont("Menu"), SCORES_LEFT, SPLASH_TOP);
+		SwinGame.DrawText(_controller.HumanPlayer.Shots.ToString(), Color.White, _controller.Resources.GameFont("Menu"), SCORES_LEFT, SHOTS_TOP);
+		SwinGame.DrawText(_controller.HumanPlayer.Hits.ToString(), Color.White, _controller.Resources.GameFont("Menu"), SCORES_LEFT, HITS_TOP);
+		SwinGame.DrawText(_controller.HumanPlayer.Missed.ToString(), Color.White, _controller.Resources.GameFont("Menu"), SCORES_LEFT, SPLASH_TOP);
+	}
+
+	public virtual void DrawDiscoveryCheat()
+	{
+		const int SCORES_LEFT = 172;
+		const int SHOTS_TOP = 157;
+		const int HITS_TOP = 206;
+		const int SPLASH_TOP = 256;
+
+		if ((SwinGame.KeyDown(KeyCode.vk_LSHIFT) || SwinGame.KeyDown(KeyCode.vk_RSHIFT)) && SwinGame.KeyDown(KeyCode.vk_c))
+		{
+			_controller.screenController.DrawField(_controller.HumanPlayer.EnemyGrid, _controller.ComputerPlayer, true);
+		}
+		else
+		{
+			_controller.screenController.DrawField(_controller.HumanPlayer.EnemyGrid, _controller.ComputerPlayer, true);
+		}
+
+		_controller.screenController.DrawSmallField(_controller.HumanPlayer.PlayerGrid, _controller.HumanPlayer);
+		_controller.screenController.DrawMessage();
+
+		SwinGame.DrawTextLines("CHEATER!!!!!!", Color.Red, Color.Transparent, _controller.Resources.GameFont("ArialLarge"), FontAlignment.AlignCenter, 0, 250, SwinGame.ScreenWidth(), SwinGame.ScreenHeight());
+		SwinGame.DrawText(_controller.HumanPlayer.Shots.ToString(), Color.White, _controller.Resources.GameFont("Menu"), SCORES_LEFT, SHOTS_TOP);
+		SwinGame.DrawText(_controller.HumanPlayer.Hits.ToString(), Color.White, _controller.Resources.GameFont("Menu"), SCORES_LEFT, HITS_TOP);
+		SwinGame.DrawText(_controller.HumanPlayer.Missed.ToString(), Color.White, _controller.Resources.GameFont("Menu"), SCORES_LEFT, SPLASH_TOP);
 	}
 
 }
-
-//=======================================================
-//Service provided by Telerik (www.telerik.com)
-//Conversion powered by NRefactory.
-//Twitter: @telerik
-//Facebook: facebook.com/telerik
-//=======================================================
