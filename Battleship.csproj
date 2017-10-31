@@ -215,6 +215,7 @@
     <None Include="Resources\sounds\ThemeDefaultPlus\background1.mp3" />
     <None Include="Resources\sounds\ThemePirate\background1.mp3" />
     <None Include="Resources\sounds\ThemePiratePlus\background1.mp3" />
+    <None Include="Resources\images\ThemeDefault\yo1.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
