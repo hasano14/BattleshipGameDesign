@@ -211,6 +211,10 @@
     <None Include="Resources\images\SplashBack.png" />
     <None Include="Resources\images\ThemePiratePlus\main_page.jpg" />
     <None Include="Resources\images\ThemePiratePlus\mainpage.jpg" />
+    <None Include="Resources\sounds\ThemeDefault\background1.mp3" />
+    <None Include="Resources\sounds\ThemeDefaultPlus\background1.mp3" />
+    <None Include="Resources\sounds\ThemePirate\background1.mp3" />
+    <None Include="Resources\sounds\ThemePiratePlus\background1.mp3" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
