@@ -12,7 +12,7 @@ public class GameResources
 		NewFont("ArialLarge", "arial.ttf", 80);
 		NewFont("Courier", "cour.ttf", 14);
 		NewFont("CourierSmall", "cour.ttf", 12);
-		NewFont("Menu", "ffaccess.ttf", 12);
+		NewFont("Menu", "ffaccess.ttf", 8);
 	}
 
 	private void LoadImages()

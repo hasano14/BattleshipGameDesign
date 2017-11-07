@@ -18,8 +18,8 @@ public class MenuController
 	/// </remarks>
 	protected static readonly string[][] _menuStructure =
 	{
-		new string[] {"PLAY", "DIFFICULTY", "  NIGHTMARE", "THEME", "SCORES", "QUIT"},
-		new string[] {"RETURN", "RESET", "CHEAT", "SURRENDER", "QUIT"},
+		new string[] {"PLAY", "DIFFICULTY", "THEME", "SCORES", "QUIT"},
+		new string[] {"RETURN", "RESET", "SURRENDER", "QUIT"},
 		new string[] {"EASY", "MEDIUM", "HARD"},
 		new string[] {"DEFAULT", "PIRATE","DEFAULT+", "PIRATE+"}
 	};
@@ -39,10 +39,9 @@ public class MenuController
 
 	protected const int MAIN_MENU_PLAY_BUTTON = 0;
     protected const int MAIN_MENU_SETUP_BUTTON = 1;
-    protected const int MAIN_MENU_NIGHTMARE_BUTTON = 2;
-    protected const int MAIN_MENU_THEMES_BUTTON = 3;
-	protected const int MAIN_MENU_TOP_SCORES_BUTTON = 4;
-	protected const int MAIN_MENU_QUIT_BUTTON = 5;
+    protected const int MAIN_MENU_THEMES_BUTTON = 2;
+	protected const int MAIN_MENU_TOP_SCORES_BUTTON = 3;
+	protected const int MAIN_MENU_QUIT_BUTTON = 4;
 
 	protected const int SETUP_MENU_EASY_BUTTON = 0;
 	protected const int SETUP_MENU_MEDIUM_BUTTON = 1;
@@ -57,9 +56,8 @@ public class MenuController
 
 	protected const int GAME_MENU_RETURN_BUTTON = 0;
 	protected const int GAME_MENU_RESET_BUTTON = 1;
-	protected const int GAME_MENU_CHEAT_BUTTON = 2;
-	protected const int GAME_MENU_SURRENDER_BUTTON = 3;
-	protected const int GAME_MENU_QUIT_BUTTON = 4;
+	protected const int GAME_MENU_SURRENDER_BUTTON = 2;
+	protected const int GAME_MENU_QUIT_BUTTON =3;
 
 	protected static readonly Color MENU_COLOR = SwinGame.RGBAColor(2, 167, 252, 255);
 	protected static readonly Color HIGHLIGHT_COLOR = SwinGame.RGBAColor(1, 57, 86, 255);
@@ -308,9 +306,7 @@ public class MenuController
             case MAIN_MENU_QUIT_BUTTON:
                 _controller.EndCurrentState();
                 break;
-            case MAIN_MENU_NIGHTMARE_BUTTON:
-                BattleShipsGame.NightMare = !BattleShipsGame.NightMare;
-                break;
+       
         }
 	}
 
@@ -390,10 +386,6 @@ public class MenuController
 			case GAME_MENU_RESET_BUTTON:
 				_controller.EndCurrentState();
 				_controller.ResetGame();
-				break;
-			case GAME_MENU_CHEAT_BUTTON:
-				_controller.EndCurrentState();
-				_controller.AddNewState(GameState.Cheat);
 				break;
 			case GAME_MENU_SURRENDER_BUTTON:
 				_controller.EndCurrentState(); //end game menu
