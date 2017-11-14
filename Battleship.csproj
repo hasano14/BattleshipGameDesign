@@ -67,12 +67,16 @@
     <Compile Include="src\Model\TileView.cs" />
     <Compile Include="src\LoadingScreen.cs" />
     <Compile Include="src\Model\AIEasyPlayer.cs" />
+    <Compile Include="src\Model\Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SwinGame">
       <HintPath>lib\SwinGame.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="nunit.framework">
+      <HintPath>packages\NUnit.3.9.0\lib\net45\nunit.framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\highscores.txt" />
@@ -216,6 +220,7 @@
     <None Include="Resources\sounds\ThemePirate\background1.mp3" />
     <None Include="Resources\sounds\ThemePiratePlus\background1.mp3" />
     <None Include="Resources\images\ThemeDefault\yo1.jpg" />
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
